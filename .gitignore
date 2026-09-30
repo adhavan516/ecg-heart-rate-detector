@@ -1,0 +1,10 @@
+# Virtual environment (libraries are installed from requirements.txt instead)
+.venv/
+
+# Editor settings
+.idea/
+.vscode/
+
+# Python cache files
+__pycache__/
+*.pyc
