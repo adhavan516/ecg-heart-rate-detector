@@ -27,6 +27,16 @@ peaks, _ = find_peaks(ecg_clean, height=0.5, distance=int(0.25 * fs))
 
 print("Heartbeats detected:", len(peaks))
 
+# RR intervals: time between neighbouring beats, in seconds
+rr = np.diff(peaks) / fs
+
+# Heart rate for every beat
+bpm = 60 / rr
+
+print("Average heart rate:", round(bpm.mean(), 1), "BPM")
+print("Slowest:", round(bpm.min(), 1), "BPM")
+print("Fastest:", round(bpm.max(), 1), "BPM")
+
 # Draw raw and cleaned ECG, one above the other
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
 
@@ -46,4 +56,17 @@ ax2.grid(True)
 ax1.set_xlim(38,48)
 plt.tight_layout()
 plt.savefig("detected_beats.png", dpi=150)
+plt.show()
+
+
+# Heart rate over time (a "tachogram")
+beat_times = time[peaks[1:]]
+
+plt.figure(figsize=(12, 4))
+plt.plot(beat_times, bpm, marker=".")
+plt.xlabel("Time (seconds)")
+plt.ylabel("Heart rate (BPM)")
+plt.title("Beat-by-beat heart rate")
+plt.grid(True)
+plt.savefig("heart_rate.png", dpi=150)
 plt.show()
