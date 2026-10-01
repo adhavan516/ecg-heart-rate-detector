@@ -1,7 +1,8 @@
 from scipy.datasets import electrocardiogram
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.signal import butter, filtfilt
+from scipy.signal import butter, filtfilt ,find_peaks
+
 
 ecg = electrocardiogram()
 
@@ -21,6 +22,11 @@ b, a = butter(2, [0.5, 40], btype="bandpass", fs=fs)
 ecg_clean = filtfilt(b, a, ecg)
 
 
+# Find R-peaks: points taller than 0.5 mV, at least 0.25 s apart
+peaks, _ = find_peaks(ecg_clean, height=0.5, distance=int(0.25 * fs))
+
+print("Heartbeats detected:", len(peaks))
+
 # Draw raw and cleaned ECG, one above the other
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
 
@@ -30,6 +36,8 @@ ax1.set_ylabel("Voltage (mV)")
 ax1.grid(True)
 
 ax2.plot(time, ecg_clean, color="green")
+ax2.plot(time[peaks], ecg_clean[peaks], "ro", markersize=4, label="Detected beats")
+ax2.legend()
 ax2.set_title("Filtered ECG (0.5–40 Hz band-pass)")
 ax2.set_xlabel("Time (seconds)")
 ax2.set_ylabel("Voltage (mV)")
@@ -37,5 +45,5 @@ ax2.grid(True)
 
 ax1.set_xlim(38,48)
 plt.tight_layout()
-plt.savefig("raw_vs_filtered.png", dpi=150)
+plt.savefig("detected_beats.png", dpi=150)
 plt.show()
